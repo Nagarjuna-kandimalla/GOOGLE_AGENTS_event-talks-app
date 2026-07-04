@@ -12,6 +12,15 @@
     --transition-speed: 0.3s;
 }
 
+body.light-theme {
+    --bg-dark: #f8fafc;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --accent-glow: rgba(59, 130, 246, 0.06);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -388,4 +397,32 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+/* Light Theme Overrides */
+body.light-theme .modal-content {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #0f172a;
+}
+
+body.light-theme .modal-header {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .modal-footer {
+    background: rgba(0, 0, 0, 0.03);
+    border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .modal-body textarea {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #0f172a;
+}
+
+body.light-theme .logo-text h1 {
+    background: linear-gradient(to right, #0f172a, #334155);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }

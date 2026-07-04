@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const spinner = document.getElementById('spinner');
     const notesContainer = document.getElementById('notes-container');
     const feedStatus = document.getElementById('feed-status');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const exportCsvBtn = document.getElementById('export-csv-btn');
     
     // Tweet modal elements
     const tweetModal = document.getElementById('tweet-modal');
@@ -41,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Start spinning
         spinner.classList.add('spinning');
         refreshBtn.disabled = true;
+        exportCsvBtn.disabled = true;
         feedStatus.classList.remove('hidden');
         notesContainer.classList.add('hidden');
 
@@ -51,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.status === 'success' && result.data) {
                 currentNotes = result.data;
                 renderNotes(currentNotes);
+                exportCsvBtn.disabled = false;
             } else {
                 showError(result.message || 'Failed to retrieve release notes.');
             }
@@ -92,7 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="note-body">
                     ${note.content}
                 </div>
-                <div class="note-actions">
+                <div class="note-actions" style="display: flex; gap: 0.75rem;">
+                    <button class="btn btn-secondary copy-btn" data-index="${index}" style="margin-right: auto;">
+                        <i class="fa-regular fa-copy"></i> Copy
+                    </button>
                     <button class="btn btn-secondary share-tweet-btn" data-index="${index}">
                         <i class="fa-brands fa-x-twitter"></i> Tweet Update
                     </button>
@@ -108,7 +116,90 @@ document.addEventListener('DOMContentLoaded', () => {
                 prepareTweet(index);
             });
         });
+
+        // Add event listeners for copy buttons
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = e.currentTarget.getAttribute('data-index');
+                copyToClipboard(index, e.currentTarget);
+            });
+        });
     }
+
+    // Copy to Clipboard Utility
+    function copyToClipboard(index, button) {
+        const note = currentNotes[index];
+        if (!note) return;
+
+        const plainContent = stripHtml(note.content).trim();
+        const textToCopy = `${note.title} (${formatDate(note.updated)})\n\n${plainContent}\n\nRead more: ${note.link}`;
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const originalHTML = button.innerHTML;
+            button.innerHTML = `<i class="fa-solid fa-check" style="color: #22c55e;"></i> Copied!`;
+            button.disabled = true;
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }, 1500);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    }
+
+    // Export to CSV Utility
+    function exportToCSV() {
+        if (currentNotes.length === 0) return;
+
+        const csvRows = [];
+        // Header row
+        csvRows.push(['Title', 'Date', 'Link', 'Content Summary']);
+
+        currentNotes.forEach(note => {
+            const date = formatDate(note.updated);
+            const plainContent = stripHtml(note.content).trim().replace(/"/g, '""'); // Escape double quotes for CSV
+            const title = note.title.replace(/"/g, '""');
+            const link = note.link;
+
+            csvRows.push([`"${title}"`, `"${date}"`, `"${link}"`, `"${plainContent}"`]);
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `bigquery_release_notes_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Theme Toggle Handler
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+            themeIcon.className = 'fa-solid fa-sun';
+        } else {
+            document.body.classList.remove('light-theme');
+            themeIcon.className = 'fa-solid fa-moon';
+        }
+    }
+
+    themeToggle.addEventListener('click', () => {
+        if (document.body.classList.contains('light-theme')) {
+            document.body.classList.remove('light-theme');
+            themeIcon.className = 'fa-solid fa-moon';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.classList.add('light-theme');
+            themeIcon.className = 'fa-solid fa-sun';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    exportCsvBtn.addEventListener('click', exportToCSV);
 
     function showError(message) {
         notesContainer.innerHTML = `
@@ -182,7 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle background click on modal to close
     document.querySelector('.modal-overlay').addEventListener('click', closeModal);
 
-    // Initial Fetch
+    // Initial Theme & Fetch
+    initTheme();
     refreshBtn.addEventListener('click', fetchReleaseNotes);
     fetchReleaseNotes();
 });
