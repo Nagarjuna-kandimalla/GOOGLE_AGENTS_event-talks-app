@@ -152,3 +152,6 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+
+# Local token storage (temporary)
+.token
