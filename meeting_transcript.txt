@@ -1,0 +1,25 @@
+Meeting Title: BigQuery Release Notes Web App Sync
+Date: July 4, 2026
+Time: 14:00 - 14:30 EST
+Attendees: Nagarjuna (Project Lead), AI Assistant (Developer)
+
+Transcript:
+
+[00:01] Nagarjuna: Thanks for jumping on the call. I want to review the current status of the BigQuery Release Notes Web Application. We need to make sure we've covered the core requirements.
+
+[00:08] AI Assistant: Happy to help! The app is fully up and running. We have the Python Flask backend serving as a proxy to fetch and parse the BigQuery XML feed, and the frontend is a modern dark-themed dashboard. It displays notes in glassmorphic cards and includes a manual Refresh button with a spinner.
+
+[00:23] Nagarjuna: Excellent. What about the sharing features?
+
+[00:27] AI Assistant: We have a "Tweet Update" button on each release note card. When clicked, it opens a modal where you can edit the pre-filled post. It tracks the 280-character limit dynamically and warns you if you exceed it, then opens the Twitter Web Intent window.
+
+[00:45] Nagarjuna: Perfect, that's exactly what I wanted. We also discussed some utility features, correct?
+
+[00:52] AI Assistant: Yes, we successfully added:
+1. A "Copy to Clipboard" button on each card for quick copy-pasting of formatted updates.
+2. An "Export to CSV" button in the header that compiles all loaded notes and downloads them as a CSV spreadsheet.
+3. A Light/Dark theme toggle button in the header that overrides the CSS variable definitions and saves your preference to localStorage.
+
+[01:15] Nagarjuna: Great. I saw we pushed this to the new GitHub repository 'GOOGLE_AGENTS_DAY2-event-talks-app' and cleaned up the credentials. This looks complete. Let's write down the final README.md and wrap this phase up.
+
+[01:28] AI Assistant: Sounds good! I will finalize the documentation.
